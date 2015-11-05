@@ -1,7 +1,9 @@
 package service_hash
 
 import (
+	"errors"
 	"github.com/serialx/hashring"
+	"log"
 	"sync"
 	"time"
 
@@ -15,6 +17,7 @@ type ServiceHash struct {
 		ring *hashring.HashRing
 	}
 	etcdClient client.Client
+	connected  bool
 }
 
 func (hash *ServiceHash) watch(watcher client.Watcher) {
@@ -37,6 +40,11 @@ func (hash *ServiceHash) watch(watcher client.Watcher) {
 }
 
 func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
+	if hash.connected {
+		log.Printf("Can't connected twice")
+		return errors.New("math: square root of negative number")
+	}
+
 	hash.ringLock.ring = hashring.New([]string{})
 
 	cfg := client.Config{
@@ -66,10 +74,15 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 
 	watcher := kapi.Watcher(serviceName, &client.WatcherOptions{Recursive: true})
 	go hash.watch(watcher)
+	hash.connected = true
 	return nil
 }
 
 func (hash *ServiceHash) Hash(key string) (string, bool) {
+	if !hash.connected {
+		log.Printf("Must call connect before Hash")
+		return "", false
+	}
 	hash.ringLock.RLock()
 	node, ok := hash.ringLock.ring.GetNode(key)
 	hash.ringLock.RUnlock()
