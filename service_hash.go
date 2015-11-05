@@ -1,8 +1,7 @@
-package main
+package service_hash
 
 import (
 	"github.com/serialx/hashring"
-	"log"
 	"sync"
 	"time"
 
@@ -27,13 +26,11 @@ func (hash *ServiceHash) watch(watcher client.Watcher) {
 				hash.ringLock.Lock()
 				hash.ringLock.ring = hash.ringLock.ring.AddNode(n)
 				hash.ringLock.Unlock()
-				log.Printf("Add node: %s", n)
 			} else if resp.Action == "delete" {
 				n := resp.PrevNode.Value
 				hash.ringLock.Lock()
 				hash.ringLock.ring = hash.ringLock.ring.RemoveNode(n)
 				hash.ringLock.Unlock()
-				log.Printf("Remove node: %s", n)
 			}
 		}
 	}
@@ -63,7 +60,6 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 			for _, peer := range resp.Node.Nodes {
 				n := peer.Value
 				hash.ringLock.ring = hash.ringLock.ring.AddNode(n)
-				log.Printf("Add node: %s", n)
 			}
 		}
 	}
@@ -78,19 +74,4 @@ func (hash *ServiceHash) Hash(key string) (string, bool) {
 	node, ok := hash.ringLock.ring.GetNode(key)
 	hash.ringLock.RUnlock()
 	return node, ok
-}
-
-func main() {
-	serviceName := "/services/busybox"
-	endPoints := []string{"http://10.45.234.177:32768"}
-
-	var hash ServiceHash
-	hash.Connect(serviceName, endPoints)
-
-	for {
-		node, _ := hash.Hash("hello world")
-		log.Printf(node)
-		time.Sleep(time.Second)
-
-	}
 }
