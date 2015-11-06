@@ -11,8 +11,8 @@
 3. Install registrator on all machines in the cluster
 
   ```
-  docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock
-    gliderlabs/registrator:latest etcd://<your etcd endpoint ip:port>/services
+  docker run -d --name=registrator --net=host --volume=/var/run/docker.sock
+    gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
   ```
   
   Note: all services will be registered under etcd's /services keyspace.
