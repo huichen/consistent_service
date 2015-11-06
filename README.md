@@ -27,7 +27,7 @@ This library provides
 
 Go to example dir and change etcd's *endPoints* to yours. Then
 
-    go run main.go
+    go run main.go --endpoints=http://<your etcd endpoint ip:port> --service_name=/services/busybox
   
 In another terminal, start and then stop a few containers under different ports like following
 
