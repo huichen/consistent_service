@@ -26,5 +26,6 @@ Go to example dir and change etcd's *endPoints* to yours. Then
 In another terminal, start and then stop a few containers under different ports like following
 
     docker run -it -p 8081:8081 busybox
+    docker run -it -p 8082:8082 busybox
 
 Check how a service node is assigned accordingly.
