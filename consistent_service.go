@@ -31,6 +31,8 @@ func (service *ConsistentService) watch(watcher client.Watcher) {
 	}
 }
 
+// serviceName is like "/services/busybox"
+// endPoints is an array of "http://<etcd client ip:port>"
 func (service *ConsistentService) Connect(serviceName string, endPoints []string) error {
 	if service.connected {
 		log.Printf("Can't connected twice")

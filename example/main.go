@@ -1,17 +1,35 @@
 package main
 
 import (
+	"flag"
 	"github.com/huichen/consistent_service"
 	"log"
+	"strings"
 	"time"
 )
 
+var (
+	endPoints   = flag.String("endpoints", "", "Comma-separated endpoints of your etcd cluster, each starting with http://.")
+	serviceName = flag.String("service_name", "", "Name of your service in etcd.")
+)
+
 func main() {
-	serviceName := "/services/busybox"
-	endPoints := []string{"http://10.45.234.177:32768"}
+	flag.Parse()
+
+	ep := strings.Split(*endPoints, ",")
+	if len(ep) == 0 {
+		log.Fatal("Can't parse --endpoints")
+	}
+
+	if *serviceName == "" {
+		log.Fatal("--service_name can't be empty")
+	}
 
 	var service consistent_service.ConsistentService
-	service.Connect(serviceName, endPoints)
+	err := service.Connect(*serviceName, ep)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for {
 		node, _ := service.GetNode("hello world")
