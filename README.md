@@ -2,9 +2,9 @@
 
 This library provides
 
-* service containerization with docker
-* service discovery and automatic registration/deregistartion with etcd and registrator
-* service node assignment with consistent hashing
+* service containerization with [docker](https://www.docker.com/)
+* service discovery and automatic registration/deregistartion with [etcd](https://github.com/coreos/etcd) and [registrator](https://github.com/gliderlabs/registrator)
+* service node assignment with [consistent hashing](https://godoc.org/stathat.com/c/consistent)
 
 ## Prerequisite
 
