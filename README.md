@@ -1,5 +1,11 @@
 # Consistent Service
 
+This library provides
+
+* service containerization with docker
+* service discovery and automatic registration/deregistartion with etcd and registrator
+* service node assignment with consistent hashing
+
 ## Prerequisite
 
 1. Install docker on your machines
