@@ -2,9 +2,8 @@ package service_hash
 
 import (
 	"errors"
-	"github.com/serialx/hashring"
 	"log"
-	"sync"
+	"stathat.com/c/consistent"
 	"time"
 
 	"github.com/coreos/etcd/Godeps/_workspace/src/golang.org/x/net/context"
@@ -12,10 +11,7 @@ import (
 )
 
 type ServiceHash struct {
-	ringLock struct {
-		sync.RWMutex
-		ring *hashring.HashRing
-	}
+	consis     *consistent.Consistent
 	etcdClient client.Client
 	connected  bool
 }
@@ -26,14 +22,10 @@ func (hash *ServiceHash) watch(watcher client.Watcher) {
 		if err == nil {
 			if resp.Action == "set" {
 				n := resp.Node.Value
-				hash.ringLock.Lock()
-				hash.ringLock.ring = hash.ringLock.ring.AddNode(n)
-				hash.ringLock.Unlock()
+				hash.consis.Add(n)
 			} else if resp.Action == "delete" {
 				n := resp.PrevNode.Value
-				hash.ringLock.Lock()
-				hash.ringLock.ring = hash.ringLock.ring.RemoveNode(n)
-				hash.ringLock.Unlock()
+				hash.consis.Remove(n)
 			}
 		}
 	}
@@ -45,7 +37,7 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 		return errors.New("math: square root of negative number")
 	}
 
-	hash.ringLock.ring = hashring.New([]string{})
+	hash.consis = consistent.New()
 
 	cfg := client.Config{
 		Endpoints:               endPoints,
@@ -67,7 +59,7 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 		if resp.Node.Dir {
 			for _, peer := range resp.Node.Nodes {
 				n := peer.Value
-				hash.ringLock.ring = hash.ringLock.ring.AddNode(n)
+				hash.consis.Add(n)
 			}
 		}
 	}
@@ -78,13 +70,10 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 	return nil
 }
 
-func (hash *ServiceHash) Hash(key string) (string, bool) {
+func (hash *ServiceHash) Hash(key string) (string, error) {
 	if !hash.connected {
-		log.Printf("Must call connect before Hash")
-		return "", false
+		return "", errors.New("Must call connect before Hash")
 	}
-	hash.ringLock.RLock()
-	node, ok := hash.ringLock.ring.GetNode(key)
-	hash.ringLock.RUnlock()
-	return node, ok
+	node, err := hash.consis.Get(key)
+	return node, err
 }

@@ -15,7 +15,11 @@ func main() {
 
 	for {
 		node, _ := hash.Hash("hello world")
-		log.Printf(node)
+		if node != "" {
+			log.Printf("assigned to node: %s", node)
+		} else {
+			log.Printf("no assignment")
+		}
 		time.Sleep(time.Second)
 	}
 }
