@@ -19,8 +19,7 @@
 
 ## Run example
 
-Go to example dir and change *serviceName* to your service name 
-[(what's this)](http://gliderlabs.com/registrator/latest/user/services/) and etcd's *endPoints*. Then
+Go to example dir and change etcd's *endPoints* to yours. Then
 
     go run main.go
   
