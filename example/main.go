@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/huichen/service_hash"
+	"github.com/huichen/consistent_service"
 	"log"
 	"time"
 )
@@ -10,11 +10,11 @@ func main() {
 	serviceName := "/services/busybox"
 	endPoints := []string{"http://10.45.234.177:32768"}
 
-	var hash service_hash.ServiceHash
-	hash.Connect(serviceName, endPoints)
+	var service consistent_service.ConsistentService
+	service.Connect(serviceName, endPoints)
 
 	for {
-		node, _ := hash.Hash("hello world")
+		node, _ := service.GetNode("hello world")
 		if node != "" {
 			log.Printf("assigned to node: %s", node)
 		} else {

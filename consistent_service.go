@@ -1,4 +1,4 @@
-package service_hash
+package consistent_service
 
 import (
 	"errors"
@@ -10,34 +10,34 @@ import (
 	"github.com/coreos/etcd/client"
 )
 
-type ServiceHash struct {
+type ConsistentService struct {
 	consis     *consistent.Consistent
 	etcdClient client.Client
 	connected  bool
 }
 
-func (hash *ServiceHash) watch(watcher client.Watcher) {
+func (service *ConsistentService) watch(watcher client.Watcher) {
 	for {
 		resp, err := watcher.Next(context.Background())
 		if err == nil {
 			if resp.Action == "set" {
 				n := resp.Node.Value
-				hash.consis.Add(n)
+				service.consis.Add(n)
 			} else if resp.Action == "delete" {
 				n := resp.PrevNode.Value
-				hash.consis.Remove(n)
+				service.consis.Remove(n)
 			}
 		}
 	}
 }
 
-func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
-	if hash.connected {
+func (service *ConsistentService) Connect(serviceName string, endPoints []string) error {
+	if service.connected {
 		log.Printf("Can't connected twice")
 		return errors.New("math: square root of negative number")
 	}
 
-	hash.consis = consistent.New()
+	service.consis = consistent.New()
 
 	cfg := client.Config{
 		Endpoints:               endPoints,
@@ -46,11 +46,11 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 	}
 
 	var err error
-	hash.etcdClient, err = client.New(cfg)
+	service.etcdClient, err = client.New(cfg)
 	if err != nil {
 		return err
 	}
-	kapi := client.NewKeysAPI(hash.etcdClient)
+	kapi := client.NewKeysAPI(service.etcdClient)
 
 	resp, err := kapi.Get(context.Background(), serviceName, nil)
 	if err != nil {
@@ -59,21 +59,21 @@ func (hash *ServiceHash) Connect(serviceName string, endPoints []string) error {
 		if resp.Node.Dir {
 			for _, peer := range resp.Node.Nodes {
 				n := peer.Value
-				hash.consis.Add(n)
+				service.consis.Add(n)
 			}
 		}
 	}
 
 	watcher := kapi.Watcher(serviceName, &client.WatcherOptions{Recursive: true})
-	go hash.watch(watcher)
-	hash.connected = true
+	go service.watch(watcher)
+	service.connected = true
 	return nil
 }
 
-func (hash *ServiceHash) Hash(key string) (string, error) {
-	if !hash.connected {
+func (service *ConsistentService) GetNode(key string) (string, error) {
+	if !service.connected {
 		return "", errors.New("Must call connect before Hash")
 	}
-	node, err := hash.consis.Get(key)
+	node, err := service.consis.Get(key)
 	return node, err
 }
