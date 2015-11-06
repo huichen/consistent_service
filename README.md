@@ -25,7 +25,7 @@ This library provides
 
 ## Run example
 
-Go to example dir and change etcd's *endPoints* to yours. Then
+Go to example dir and
 
     go run main.go --endpoints=http://<your etcd endpoint ip:port> --service_name=/services/busybox
   
