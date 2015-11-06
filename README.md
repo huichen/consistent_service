@@ -1,5 +1,4 @@
-# service_hash
-Consistent Service
+# Consistent Service
 
 ## Prerequisite
 
