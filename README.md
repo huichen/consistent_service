@@ -25,13 +25,13 @@ This library provides
 
 ## Run example
 
+Start a few busybox containers with different ports
+
+    docker run -d -p 8081:8081 busybox
+    docker run -d -p 8082:8082 busybox
+
 Go to example dir and
 
     go run main.go --endpoints=http://<your etcd endpoint ip:port> --service_name=/services/busybox
   
-In another terminal, start and then stop a few containers under different ports like following
-
-    docker run -it -p 8081:8081 busybox
-    docker run -it -p 8082:8082 busybox
-
-Check how a service node is assigned accordingly.
+Then stop/restart a few containers and check how a service node is assigned accordingly.
