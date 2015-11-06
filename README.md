@@ -1,5 +1,5 @@
 # service_hash
-Consistent Hashing with Service Discovery
+Consistent Service
 
 ## Prerequisite
 
@@ -18,7 +18,7 @@ Consistent Hashing with Service Discovery
   
   Note: all services will be registered under etcd's /services keyspace.
 
-## Run service_hash example
+## Run example
 
 Go to example dir and change *serviceName* to your service name 
 [(what's this)](http://gliderlabs.com/registrator/latest/user/services/) and etcd's *endPoints*. Then
