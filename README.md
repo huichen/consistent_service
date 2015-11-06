@@ -17,7 +17,7 @@ This library provides
 3. Install registrator on all machines in the cluster
 
   ```
-  docker run -d --name=registrator --net=host --volume=/var/run/docker.sock
+  docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock
     gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
   ```
   
