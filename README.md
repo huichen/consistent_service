@@ -28,4 +28,4 @@ In another terminal, start and then stop a few containers under different ports 
 
     docker run -it -p 8081:8081 busybox
 
-Check how a request is hashed accordingly.
+Check how a service node is assigned accordingly.
