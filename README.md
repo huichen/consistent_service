@@ -6,7 +6,7 @@
 
 2. Launch an etcd cluster
   
-  Do it your way or the easiest way via [dockerize_etcd](https://github.com/huichen/dockerize_etcd)
+  Do it your way or the easiest way via [dockerize_etcd](https://github.com/huichen/etcd_docker)
 
 3. Install registrator on all machines in the cluster
 
