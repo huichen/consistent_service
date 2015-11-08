@@ -2,8 +2,8 @@ package consistent_service
 
 import (
 	"errors"
+	"github.com/huichen/consistent_hashing"
 	"log"
-	"stathat.com/c/consistent"
 	"time"
 
 	"github.com/coreos/etcd/Godeps/_workspace/src/golang.org/x/net/context"
@@ -11,7 +11,7 @@ import (
 )
 
 type ConsistentService struct {
-	consis     *consistent.Consistent
+	consis     *consistent_hashing.Consistent
 	etcdClient client.Client
 	connected  bool
 	nodes      map[string]bool
@@ -48,7 +48,7 @@ func (service *ConsistentService) Connect(serviceName string, endPoints []string
 
 	service.nodes = make(map[string]bool)
 
-	service.consis = consistent.New()
+	service.consis = consistent_hashing.New()
 
 	cfg := client.Config{
 		Endpoints:               endPoints,
