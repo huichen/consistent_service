@@ -14,6 +14,7 @@ type ConsistentService struct {
 	consis     *consistent.Consistent
 	etcdClient client.Client
 	connected  bool
+	nodes      map[string]bool
 }
 
 func (service *ConsistentService) watch(watcher client.Watcher) {
@@ -22,10 +23,16 @@ func (service *ConsistentService) watch(watcher client.Watcher) {
 		if err == nil {
 			if resp.Action == "set" {
 				n := resp.Node.Value
-				service.consis.Add(n)
+				if _, ok := service.nodes[n]; !ok {
+					service.consis.Add(n)
+					service.nodes[n] = true
+				}
 			} else if resp.Action == "delete" {
 				n := resp.PrevNode.Value
-				service.consis.Remove(n)
+				if _, ok := service.nodes[n]; ok {
+					service.consis.Remove(n)
+					delete(service.nodes, n)
+				}
 			}
 		}
 	}
@@ -38,6 +45,8 @@ func (service *ConsistentService) Connect(serviceName string, endPoints []string
 		log.Printf("Can't connected twice")
 		return errors.New("math: square root of negative number")
 	}
+
+	service.nodes = make(map[string]bool)
 
 	service.consis = consistent.New()
 
@@ -61,7 +70,10 @@ func (service *ConsistentService) Connect(serviceName string, endPoints []string
 		if resp.Node.Dir {
 			for _, peer := range resp.Node.Nodes {
 				n := peer.Value
-				service.consis.Add(n)
+				if _, ok := service.nodes[n]; !ok {
+					service.consis.Add(n)
+					service.nodes[n] = true
+				}
 			}
 		}
 	}
@@ -74,8 +86,17 @@ func (service *ConsistentService) Connect(serviceName string, endPoints []string
 
 func (service *ConsistentService) GetNode(key string) (string, error) {
 	if !service.connected {
-		return "", errors.New("Must call connect before Hash")
+		return "", errors.New("Must call connect first")
 	}
 	node, err := service.consis.Get(key)
 	return node, err
+}
+
+// Gets the N closest distinct nodes.
+func (service *ConsistentService) GetNodes(key string, n int) ([]string, error) {
+	if !service.connected {
+		return nil, errors.New("Must call connect first")
+	}
+	nodes, err := service.consis.GetN(key, n)
+	return nodes, err
 }

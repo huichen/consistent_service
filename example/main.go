@@ -32,9 +32,9 @@ func main() {
 	}
 
 	for {
-		node, _ := service.GetNode("hello world")
-		if node != "" {
-			log.Printf("assigned to node: %s", node)
+		nodes, _ := service.GetNodes("hello world", 2)
+		if nodes != nil {
+			log.Printf("assigned to node: %v", nodes)
 		} else {
 			log.Printf("no assignment")
 		}
