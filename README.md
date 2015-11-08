@@ -18,7 +18,7 @@ This library provides
 
   ```
   docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock
-    -ttl 6 -ttl-refresh 3 --resync 1 gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
+    gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
   ```
   
   Note: all services will be registered under etcd's /services keyspace.
