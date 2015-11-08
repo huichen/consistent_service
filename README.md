@@ -18,7 +18,7 @@ This library provides
 
   ```
   docker run -d --name=registrator --net=host --volume=/var/run/docker.sock:/tmp/docker.sock
-    gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
+    -ttl 6 -ttl-refresh 3 --resync 1 gliderlabs/registrator etcd://<your etcd endpoint ip:port>/services
   ```
   
   Note: all services will be registered under etcd's /services keyspace.
@@ -27,8 +27,8 @@ This library provides
 
 Start a few busybox containers with different ports
 
-    docker run -d -p 8081:8081 busybox
-    docker run -d -p 8082:8082 busybox
+    docker run -it -p 8081:8081 busybox
+    docker run -it -p 8082:8082 busybox
 
 Go to example dir and
 
